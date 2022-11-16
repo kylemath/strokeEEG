@@ -1,0 +1,29 @@
+
+03_GYRO_EVT_2_stroke_study_updated - missing
+08_GYRO_EVT_2_stroke_study_updated - currupted
+12_ACC_EVT_2_stroke_study_updated - missing
+15_ACC_EVT_2_stroke_study_updated - missing
+16_GYRO_EVT_3_stroke_study_updated - missing
+17_EEG_EVT_1_stroke_study_updated - corrupted
+19_GYRO_EVT_3_stroke_study_updated - corrupted
+
+Subject 12 - 27 -
+Recorded using app, different columns and headers
+
+
+GYRO
+1-11
+timestamps	X	Y	Z	Marker0
+12-27
+Timestamp (ms)	sequenceId	x	y	z
+
+EEG
+timestamps	TP9	AF7	AF8	TP10	Right AUX	Marker0
+vs
+Timestamp (ms)	ch0_4ms	ch1_4ms	ch2_4ms	ch3_4ms	chAux_4ms	info
+
+ACC
+timestamps	X	Y	Z	Marker0
+vs
+Timestamp (ms)	sequenceId	x	y	z
+
