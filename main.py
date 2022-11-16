@@ -41,24 +41,42 @@ for isub in [1, 2, 4, 5, 6, 7, 9, 10, 11, 13, 14, 18, 20, 21, 22, 23, 24, 25, 26
 			ACCchannels = df.columns[9:12].tolist()
 			GYROchannels = df.columns[14:17].tolist()
 		
-		print(EEGchannels, ACCchannels, GYROchannels)
+		# print(EEGchannels, ACCchannels, GYROchannels)
 
-		for ind, channel in enumerate(EEGchannels):
-			axs[ind, isesh - 1].plot(df['timestamps'], df[channel], 'r-', label=channel)
-			axs[ind, isesh - 1].set_xlabel('Time (ms)')
-			axs[ind, isesh - 1].set_ylabel('Voltage (uV)')
-			axs[ind, isesh - 1].set_title(channel)
-		for ind, channel in enumerate(ACCchannels):
-			axs[len(EEGchannels) + ind, isesh - 1].plot(df['timestamps'], df[channel], 'r-', label=channel)
-			axs[len(EEGchannels) + ind, isesh - 1].set_xlabel('Time (ms)')
-			axs[len(EEGchannels) + ind, isesh - 1].set_ylabel('Voltage (uV)')
-			axs[len(EEGchannels) + ind, isesh - 1].set_title(channel)
+		##
+		##-----
+		##-----
 
-		for ind, channel in enumerate(GYROchannels):
-			axs[len(EEGchannels) + len(ACCchannels) + ind, isesh - 1].plot(df['timestamps'], df[channel], 'r-', label=channel)
-			axs[len(EEGchannels) + len(ACCchannels) + ind, isesh - 1].set_xlabel('Time (ms)')
-			axs[len(EEGchannels) + len(ACCchannels) + ind, isesh - 1].set_ylabel('Voltage (uV)')
-			axs[len(EEGchannels) + len(ACCchannels) + ind, isesh - 1].set_title(channel)	
+		#load data into MNE
+		#Filter
+		#spectra
+		#average over subjects
+		#plot
+
+
+
+
+		##-----
+		#----
+
+		# for ind, channel in enumerate(EEGchannels):
+		# 	axs[ind, isesh - 1].plot(df['timestamps'], df[channel], 'r-', label=channel)
+		# 	axs[ind, isesh - 1].set_xlabel('Time (ms)')
+		# 	axs[ind, isesh - 1].set_ylabel('Voltage (uV)')
+		# 	axs[ind, isesh - 1].set_title(channel)
+		# for ind, channel in enumerate(ACCchannels):
+		# 	axs[len(EEGchannels) + ind, isesh - 1].plot(df['timestamps'], df[channel], 'r-', label=channel)
+		# 	axs[len(EEGchannels) + ind, isesh - 1].set_xlabel('Time (ms)')
+		# 	axs[len(EEGchannels) + ind, isesh - 1].set_ylabel('Voltage (uV)')
+		# 	axs[len(EEGchannels) + ind, isesh - 1].set_title(channel)
+
+		# for ind, channel in enumerate(GYROchannels):
+		# 	axs[len(EEGchannels) + len(ACCchannels) + ind, isesh - 1].plot(df['timestamps'], df[channel], 'r-', label=channel)
+		# 	axs[len(EEGchannels) + len(ACCchannels) + ind, isesh - 1].set_xlabel('Time (ms)')
+		# 	axs[len(EEGchannels) + len(ACCchannels) + ind, isesh - 1].set_ylabel('Voltage (uV)')
+		# 	axs[len(EEGchannels) + len(ACCchannels) + ind, isesh - 1].set_title(channel)	
 	
+
+
 	plt.suptitle(['subject:', substr])
 	plt.show()
