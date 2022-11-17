@@ -7,7 +7,7 @@
 17_EEG_EVT_1_stroke_study_updated - corrupted
 19_GYRO_EVT_3_stroke_study_updated - corrupted
 
-Subject 12 - 27 -
+Subject 12 - 16
 Recorded using app, different columns and headers
 
 
