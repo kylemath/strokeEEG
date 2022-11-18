@@ -119,6 +119,7 @@ for isub in [1, 2, 4, 5, 6, 7, 9, 10, 11, 13, 14, 18, 20, 21, 22, 23, 24, 25, 26
 # plt.show()
 
 print(np.shape(outPSD))
+npOut = np.array(outPSD)
 
 fig, axs = plt.subplots(3)
 for isesh in range(3):
