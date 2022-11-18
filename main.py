@@ -10,6 +10,9 @@ pd.options.display.float_format = '{:.9f}'.format
 # missing files = [3, 8, 12, 15, 16, 17, 19]
 # 
 outPSD = []
+# hemiDamage = ['Left', 'Right', 'Left', ]
+# strokePresence = [True, False, True]
+# strokeType = ['LVO', 'Not LVO', 'LVO']
 
 for isub in [1, 2, 4, 5, 6, 7, 9, 10, 11, 13, 14, 18, 20, 21, 22, 23, 24, 25, 26, 27]:
 	substr = str(isub).zfill(2)
