@@ -6,15 +6,15 @@ import time
 pd.options.display.float_format = '{:.9f}'.format
 
 
-# for isub in [1, 2, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]:
-# missing files = [3, 8, 12, 15, 16, 17, 19]
+# for isub in [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]:
+# missing files = [3, 16]
 # 
 outPSD = []
 # hemiDamage = ['Left', 'Right', 'Left', ]
 # strokePresence = [True, False, True]
 # strokeType = ['LVO', 'Not LVO', 'LVO']
-
-for isub in [1, 2, 4, 5, 6, 7, 9, 10, 11, 13, 14, 18, 20, 21, 22, 23, 24, 25, 26, 27]:
+strokeHemisphere = [2,	2,	2,	1,	2,	1,	2,	1,	1,	2,	1,	2,	1,	2,	1,	2,	1,	1,	1,	2,	2,	1]
+for isub in [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]:
 	substr = str(isub).zfill(2)
 	print('______________')
 	print('Subject #: ' + substr)
@@ -62,6 +62,8 @@ for isub in [1, 2, 4, 5, 6, 7, 9, 10, 11, 13, 14, 18, 20, 21, 22, 23, 24, 25, 26
 		else: 
 			srate = round(1/intervals.mean())
 		print(srate)
+		# maybe here change channel names depending on hemeisphere variable above?
+		
 		ch_names = ['TP9', 'AF7', 'AF8', 'TP10', 'Wrist', 'X_x', 'Y_x', 'Z_x', 'X_y', 'Y_y', 'Z_y']
 		ch_types = ['eeg'] * 4 + ['ecg'] + ['bio'] * 6
 		info = mne.create_info(ch_names, ch_types=ch_types, sfreq=srate)
@@ -124,7 +126,7 @@ for isub in [1, 2, 4, 5, 6, 7, 9, 10, 11, 13, 14, 18, 20, 21, 22, 23, 24, 25, 26
 print(np.shape(outPSD))
 npOut = np.array(outPSD)
 
-fig, axs = plt.subplots(3)
+fig, axs = plt.subplots(1,3)
 for isesh in range(3):
 	axs[isesh].plot(freqs[:50], np.log10(npOut[:, isesh, :, :50].mean(axis=0).transpose()))
 	axs[isesh].legend(ch_names)
@@ -132,6 +134,7 @@ for isesh in range(3):
 	axs[isesh].set_ylabel('Power (uV^2)')
 	title = 'Session #:' + str(isesh+1)
 	axs[isesh].set_title(title)
+	axs[isesh].set_ylim([-20, -8])
 plt.show()
 
 
