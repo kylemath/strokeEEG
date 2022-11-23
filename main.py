@@ -14,7 +14,9 @@ outPSD = []
 # strokePresence = [True, False, True]
 # strokeType = ['LVO', 'Not LVO', 'LVO']
 strokeHemisphere = [2,	2,	2,	1,	2,	1,	2,	1,	1,	2,	1,	2,	1,	2,	1,	2,	1,	1,	1,	2,	2,	1]
-for isub in [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]:
+for idx, isub in enumerate([1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]):
+# for idx, isub in enumerate([1, 2]):
+
 	substr = str(isub).zfill(2)
 	print('______________')
 	print('Subject #: ' + substr)
@@ -63,9 +65,12 @@ for isub in [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 18, 19, 20, 21, 22, 23, 24,
 			srate = round(1/intervals.mean())
 		print(srate)
 		# maybe here change channel names depending on hemeisphere variable above?
-		
-		ch_names = ['TP9', 'AF7', 'AF8', 'TP10', 'Wrist', 'X_x', 'Y_x', 'Z_x', 'X_y', 'Y_y', 'Z_y']
-		ch_types = ['eeg'] * 4 + ['ecg'] + ['bio'] * 6
+		if strokeHemisphere[idx] == 1:
+			ch_names = ['BadTP', 'BadAF', 'GoodTP', 'GoodAF', 'Wrist', 'X_x', 'Y_x', 'Z_x', 'X_y', 'Y_y', 'Z_y']
+		else:
+			ch_names = ['GoodTP', 'GoodAF', 'BadTP', 'BadAF', 'Wrist', 'X_x', 'Y_x', 'Z_x', 'X_y', 'Y_y', 'Z_y']
+
+		ch_types = ['bio'] * 4 + ['ecg'] + ['bio'] * 6
 		info = mne.create_info(ch_names, ch_types=ch_types, sfreq=srate)
 		info.set_montage('standard_1020')
 
@@ -125,16 +130,80 @@ for isub in [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 18, 19, 20, 21, 22, 23, 24,
 
 print(np.shape(outPSD))
 npOut = np.array(outPSD)
+seshNames = ['Pre', 'Post', 'Late']
 
+preAll = np.log10(npOut[:, 0, :, 1:50])
+postAll = np.log10(npOut[:, 1, :, 1:50])
+lateAll = np.log10(npOut[:, 2, :, 1:50])
+
+# print(preAll)
+# print(postAll)
+
+prePostAll = np.subtract(preAll,postAll)
+preLateAll = np.subtract(preAll,lateAll)
+postLateAll = np.subtract(postAll, lateAll)
+
+print(prePostAll)
+# print(postAll)
+
+prePostAllAvg = prePostAll.mean(axis=0).transpose()
+preLateAllAvg = preLateAll.mean(axis=0).transpose()
+postLateAllAvg = postLateAll.mean(axis=0).transpose()
+
+prePostAllStd = prePostAll.std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
+preLateAllStd = preLateAll.std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
+postLateAllStd = postLateAll.std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
+
+# print(prePostAllAvg)
+# print(np.shape(prePostAllAvg))
+
+preAvg = np.log10(npOut[:, 0, :, 1:50]).mean(axis=0).transpose()
+preAvgStd = np.log10(npOut[:, 0, :, 1:50]).std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
+postAvg = np.log10(npOut[:, 1, :, 1:50]).mean(axis=0).transpose()
+postAvgStd =  np.log10(npOut[:, 1, :, 1:50]).std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
+lateAvg = np.log10(npOut[:, 2, :, 1:50]).mean(axis=0).transpose()
+lateAvgStd =  np.log10(npOut[:, 2, :, 1:50]).std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
+
+avgs = [preAvg, postAvg, lateAvg]
+stds = [preAvgStd, postAvgStd, lateAvgStd]
 fig, axs = plt.subplots(1,3)
 for isesh in range(3):
-	axs[isesh].plot(freqs[:50], np.log10(npOut[:, isesh, :, :50].mean(axis=0).transpose()))
-	axs[isesh].legend(ch_names)
+	axs[isesh].plot(freqs[1:50], avgs[isesh])
+	for ichan in range(11):
+		axs[isesh].fill_between(freqs[1:50], avgs[isesh][:, ichan]-stds[isesh][:, ichan], avgs[isesh][:, ichan]+stds[isesh][:, ichan], alpha=0.2)
+
 	axs[isesh].set_xlabel('Frequency (Hz)')
 	axs[isesh].set_ylabel('Power (uV^2)')
-	title = 'Session #:' + str(isesh+1)
+	title = 'Session:' + seshNames[isesh]
 	axs[isesh].set_title(title)
-	axs[isesh].set_ylim([-20, -8])
+	axs[isesh].set_ylim([-22, -8])
+
+
+fig, axs = plt.subplots(3,3)
+
+axs[0,0].plot(freqs[1:50], prePostAllAvg )
+for ichan in range(11):
+	axs[0,0].fill_between(freqs[1:50], prePostAllAvg[:, ichan]-prePostAllStd[:, ichan], prePostAllAvg[:, ichan]+prePostAllStd[:, ichan], alpha=0.2)
+axs[0,0].set_ylim([-.1, 1.5])
+axs[0,0].set_title('Pre - Post')
+axs[0,0].plot([0, freqs[50]], [0, 0], 'k')
+
+axs[0,1].plot(freqs[1:50], preLateAllAvg )
+for ichan in range(11):
+	axs[0,1].fill_between(freqs[1:50], preLateAllAvg[:, ichan]-preLateAllStd[:, ichan], preLateAllAvg[:, ichan]+preLateAllStd[:, ichan], alpha=0.2)
+axs[0,1].set_ylim([-.1, 1.5])
+axs[0,1].set_title('Pre - Late')
+axs[0,1].plot([0, freqs[50]], [0, 0], 'k')
+
+axs[0,2].plot(freqs[1:50], postLateAllAvg )
+for ichan in range(11):
+	axs[0,1].fill_between(freqs[1:50], postLateAllAvg[:, ichan]-postLateAllStd[:, ichan], postLateAllAvg[:, ichan]+postLateAllStd[:, ichan], alpha=0.2)
+axs[0,2].set_ylim([-.1, 1.5])
+axs[0,2].set_title('Post - Late')
+axs[0,2].plot([0, freqs[50]], [0, 0], 'k')
+
+axs[0,2].legend(ch_names)
+
 plt.show()
 
 
