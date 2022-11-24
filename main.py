@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import mne
 import numpy as np
 import time
+import pickle
 pd.options.display.float_format = '{:.9f}'.format
 
 
@@ -65,12 +66,10 @@ for idx, isub in enumerate([1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 18, 19, 20, 
 			srate = round(1/intervals.mean())
 		print(srate)
 		# maybe here change channel names depending on hemeisphere variable above?
-		if strokeHemisphere[idx] == 1:
-			ch_names = ['BadTP', 'BadAF', 'GoodTP', 'GoodAF', 'Wrist', 'X_x', 'Y_x', 'Z_x', 'X_y', 'Y_y', 'Z_y']
-		else:
-			ch_names = ['GoodTP', 'GoodAF', 'BadTP', 'BadAF', 'Wrist', 'X_x', 'Y_x', 'Z_x', 'X_y', 'Y_y', 'Z_y']
+		ch_names = ['TP7', 'AF9', 'TP8', 'AF10', 'Wrist', 'ACC_x', 'ACC_x', 'ACC_x', 'GYRO_y', 'GYRO_y', 'GYRO_y']
+			# ch_names = ['GoodTP', 'GoodAF', 'BadTP', 'BadAF', 'Wrist', 'X_x', 'Y_x', 'Z_x', 'X_y', 'Y_y', 'Z_y']
 
-		ch_types = ['bio'] * 4 + ['ecg'] + ['bio'] * 6
+		ch_types = ['eeg'] * 4 + ['ecg'] + ['bio'] * 6
 		info = mne.create_info(ch_names, ch_types=ch_types, sfreq=srate)
 		info.set_montage('standard_1020')
 
@@ -136,15 +135,9 @@ preAll = np.log10(npOut[:, 0, :, 1:50])
 postAll = np.log10(npOut[:, 1, :, 1:50])
 lateAll = np.log10(npOut[:, 2, :, 1:50])
 
-# print(preAll)
-# print(postAll)
-
 prePostAll = np.subtract(preAll,postAll)
 preLateAll = np.subtract(preAll,lateAll)
 postLateAll = np.subtract(postAll, lateAll)
-
-print(prePostAll)
-# print(postAll)
 
 prePostAllAvg = prePostAll.mean(axis=0).transpose()
 preLateAllAvg = preLateAll.mean(axis=0).transpose()
@@ -153,9 +146,6 @@ postLateAllAvg = postLateAll.mean(axis=0).transpose()
 prePostAllStd = prePostAll.std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
 preLateAllStd = preLateAll.std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
 postLateAllStd = postLateAll.std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
-
-# print(prePostAllAvg)
-# print(np.shape(prePostAllAvg))
 
 preAvg = np.log10(npOut[:, 0, :, 1:50]).mean(axis=0).transpose()
 preAvgStd = np.log10(npOut[:, 0, :, 1:50]).std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
@@ -166,45 +156,22 @@ lateAvgStd =  np.log10(npOut[:, 2, :, 1:50]).std(axis=0).transpose()/np.sqrt(len
 
 avgs = [preAvg, postAvg, lateAvg]
 stds = [preAvgStd, postAvgStd, lateAvgStd]
-fig, axs = plt.subplots(1,3)
-for isesh in range(3):
-	axs[isesh].plot(freqs[1:50], avgs[isesh])
-	for ichan in range(11):
-		axs[isesh].fill_between(freqs[1:50], avgs[isesh][:, ichan]-stds[isesh][:, ichan], avgs[isesh][:, ichan]+stds[isesh][:, ichan], alpha=0.2)
+allAvgs = [prePostAllAvg, preLateAllAvg, postLateAllAvg]
+allStds = [prePostAllStd, preLateAllStd, postLateAllStd]
+freqs = freqs
 
-	axs[isesh].set_xlabel('Frequency (Hz)')
-	axs[isesh].set_ylabel('Power (uV^2)')
-	title = 'Session:' + seshNames[isesh]
-	axs[isesh].set_title(title)
-	axs[isesh].set_ylim([-22, -8])
+outDict = {	
+			'avgs': avgs, 
+			'stds': stds, 
+			'allAvgs': allAvgs, 
+			'allStds': allStds, 
+			'freqs': freqs, 
+			'ch_names': ch_names 
+}
 
+with open('outDict.pickle', 'wb') as f:
+    pickle.dump(outDict, f)
 
-fig, axs = plt.subplots(3,3)
-
-axs[0,0].plot(freqs[1:50], prePostAllAvg )
-for ichan in range(11):
-	axs[0,0].fill_between(freqs[1:50], prePostAllAvg[:, ichan]-prePostAllStd[:, ichan], prePostAllAvg[:, ichan]+prePostAllStd[:, ichan], alpha=0.2)
-axs[0,0].set_ylim([-.1, 1.5])
-axs[0,0].set_title('Pre - Post')
-axs[0,0].plot([0, freqs[50]], [0, 0], 'k')
-
-axs[0,1].plot(freqs[1:50], preLateAllAvg )
-for ichan in range(11):
-	axs[0,1].fill_between(freqs[1:50], preLateAllAvg[:, ichan]-preLateAllStd[:, ichan], preLateAllAvg[:, ichan]+preLateAllStd[:, ichan], alpha=0.2)
-axs[0,1].set_ylim([-.1, 1.5])
-axs[0,1].set_title('Pre - Late')
-axs[0,1].plot([0, freqs[50]], [0, 0], 'k')
-
-axs[0,2].plot(freqs[1:50], postLateAllAvg )
-for ichan in range(11):
-	axs[0,1].fill_between(freqs[1:50], postLateAllAvg[:, ichan]-postLateAllStd[:, ichan], postLateAllAvg[:, ichan]+postLateAllStd[:, ichan], alpha=0.2)
-axs[0,2].set_ylim([-.1, 1.5])
-axs[0,2].set_title('Post - Late')
-axs[0,2].plot([0, freqs[50]], [0, 0], 'k')
-
-axs[0,2].legend(ch_names)
-
-plt.show()
 
 
 
