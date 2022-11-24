@@ -24,8 +24,11 @@ for isesh in range(3):
 	axs[isesh].set_ylabel('Power (uV^2)')
 	title = 'Session:' + seshNames[isesh]
 	axs[isesh].set_title(title)
-
 axs[2].legend(ch_names, loc=7)
+axs[0].set_ylim([-21, -8])
+axs[1].set_ylim([-21, -8])
+axs[2].set_ylim([-21, -8])
+
 plt.show()
 
 titles = ['Pre-Post', 'Pre-Late', 'Post-Late']
