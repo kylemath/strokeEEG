@@ -32,6 +32,9 @@ main.py - computes spectra after dividing data into good and bad hemisphere by s
 mainHemi.py - computes the spectra without considering stroke hemisphere
 plot.py - plots the output file saved by either of those two scripts 
 
+mainGoodBad.py - computes difference between good and bad hemisphere for each person
+plotGoodBad.py - plots those over sessions
+
 plotRaw.py - loads in each subjects data and plots all of it for sanity check
             - can also plot the interval between time points to check sampling rate
 plotMNE.py - plots the raw data and spectra loaded into MNE for additional sanity check, 

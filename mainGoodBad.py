@@ -10,6 +10,7 @@ outPSD = []
 allSubjectNumber = [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
 #R=1; L=2
 strokeHemisphere = [2, 2, 2, 1,	2, 1, 2, 1,	1,	2,	1,	2,	1,	2,	1,	2,	1,	1,	1,	2,	2,	1]
+surgerySucsScore = [1, 2, 3]
 
 for idx, isub in enumerate(allSubjectNumber):
 
@@ -95,50 +96,63 @@ seshNames = ['Pre', 'Post', 'Late']
 preAll = np.log10(npOut[:, 0, :, 1:50])
 postAll = np.log10(npOut[:, 1, :, 1:50])
 lateAll = np.log10(npOut[:, 2, :, 1:50])
-print('$$$$$$$$$')
-print(np.shape(preAll))
-print('$$$$$$$$$')
+
+# subtract good - bad hemisphere for each subject and channel and spectra
+preAllGoodBadTP = preAll[:,0,:]-preAll[:,3,:]
+preAllGoodBadAF = preAll[:,1,:]-preAll[:,2,:]
+postAllGoodBadTP = postAll[:,0,:]-postAll[:,3,:]
+postAllGoodBadAF = postAll[:,1,:]-postAll[:,2,:]
+lateAllGoodBadTP = lateAll[:,0,:]-lateAll[:,3,:]
+lateAllGoodBadAF = lateAll[:,1,:]-lateAll[:,2,:]
+
+preAllGoodBadTPavg =  preAllGoodBadTP.mean(axis=0).transpose()
+preAllGoodBadAFavg =  preAllGoodBadAF.mean(axis=0).transpose()
+postAllGoodBadTPavg = postAllGoodBadTP.mean(axis=0).transpose()
+postAllGoodBadAFavg = postAllGoodBadAF.mean(axis=0).transpose()
+lateAllGoodBadTPavg = lateAllGoodBadTP.mean(axis=0).transpose()
+lateAllGoodBadAFavg = lateAllGoodBadAF.mean(axis=0).transpose()
+
+preAllGoodBadTPstd =  preAllGoodBadTP.std(axis=0).transpose() / np.sqrt(len(strokeHemisphere))
+preAllGoodBadAFstd =  preAllGoodBadAF.std(axis=0).transpose() / np.sqrt(len(strokeHemisphere))
+postAllGoodBadTPstd = postAllGoodBadTP.std(axis=0).transpose() / np.sqrt(len(strokeHemisphere))
+postAllGoodBadAFstd = postAllGoodBadAF.std(axis=0).transpose() / np.sqrt(len(strokeHemisphere))
+lateAllGoodBadTPstd = lateAllGoodBadTP.std(axis=0).transpose() / np.sqrt(len(strokeHemisphere))
+lateAllGoodBadAFstd = lateAllGoodBadAF.std(axis=0).transpose() / np.sqrt(len(strokeHemisphere))
 
 
-
-
-prePostAll = np.subtract(preAll, postAll)
-preLateAll = np.subtract(preAll, lateAll)
-postLateAll = np.subtract(postAll, lateAll)
-
-prePostAllAvg = prePostAll.mean(axis=0).transpose()
-preLateAllAvg = preLateAll.mean(axis=0).transpose()
-postLateAllAvg = postLateAll.mean(axis=0).transpose()
-
-prePostAllStd = prePostAll.std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
-preLateAllStd = preLateAll.std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
-postLateAllStd = postLateAll.std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
-
-preAvg = np.log10(npOut[:, 0, :, 1:50]).mean(axis=0).transpose()
-preAvgStd = np.log10(npOut[:, 0, :, 1:50]).std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
-postAvg = np.log10(npOut[:, 1, :, 1:50]).mean(axis=0).transpose()
-postAvgStd =  np.log10(npOut[:, 1, :, 1:50]).std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
-lateAvg = np.log10(npOut[:, 2, :, 1:50]).mean(axis=0).transpose()
-lateAvgStd =  np.log10(npOut[:, 2, :, 1:50]).std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
-
-avgs = [preAvg, postAvg, lateAvg]
-stds = [preAvgStd, postAvgStd, lateAvgStd]
-allAvgs = [prePostAllAvg, preLateAllAvg, postLateAllAvg]
-allStds = [prePostAllStd, preLateAllStd, postLateAllStd]
+avgs = [preAllGoodBadTPavg, preAllGoodBadAFavg, postAllGoodBadTPavg, postAllGoodBadAFavg, lateAllGoodBadTPavg, lateAllGoodBadAFavg]
+stds = [preAllGoodBadTPstd, preAllGoodBadAFstd, postAllGoodBadTPstd, postAllGoodBadAFstd, lateAllGoodBadTPstd, lateAllGoodBadAFstd]
 freqs = freqs
 
 outDict = {	
 			'avgs': avgs, 
-			'stds': stds, 
-			'allAvgs': allAvgs, 
-			'allStds': allStds, 
+			'stds': stds,  
 			'freqs': freqs, 
 			'ch_names': ch_names,
 }
 
-with open('outDict.pickle', 'wb') as f:
+with open('outDictGoodBad.pickle', 'wb') as f:
     pickle.dump(outDict, f)
 
 
+
+# prePostAll = np.subtract(preAll, postAll)
+# preLateAll = np.subtract(preAll, lateAll)
+# postLateAll = np.subtract(postAll, lateAll)
+
+# prePostAllAvg = prePostAll.mean(axis=0).transpose()
+# preLateAllAvg = preLateAll.mean(axis=0).transpose()
+# postLateAllAvg = postLateAll.mean(axis=0).transpose()
+
+# prePostAllStd = prePostAll.std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
+# preLateAllStd = preLateAll.std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
+# postLateAllStd = postLateAll.std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
+
+# preAvg = np.log10(npOut[:, 0, :, 1:50]).mean(axis=0).transpose()
+# preAvgStd = np.log10(npOut[:, 0, :, 1:50]).std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
+# postAvg = np.log10(npOut[:, 1, :, 1:50]).mean(axis=0).transpose()
+# postAvgStd =  np.log10(npOut[:, 1, :, 1:50]).std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
+# lateAvg = np.log10(npOut[:, 2, :, 1:50]).mean(axis=0).transpose()
+# lateAvgStd =  np.log10(npOut[:, 2, :, 1:50]).std(axis=0).transpose()/np.sqrt(len(strokeHemisphere))
 
 
