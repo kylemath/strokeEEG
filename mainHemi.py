@@ -8,7 +8,6 @@ pd.options.display.float_format = '{:.9f}'.format
 
 outPSD = []
 allSubjectNumber = [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
-#R=1; L=2
 strokeHemisphere = [2, 2, 2, 1,	2, 1, 2, 1,	1,	2,	1,	2,	1,	2,	1,	2,	1,	1,	1,	2,	2,	1]
 
 for idx, isub in enumerate(allSubjectNumber):
@@ -34,7 +33,7 @@ for idx, isub in enumerate(allSubjectNumber):
 
 		df = pd.merge_asof(dfs['EEG'], dfs['ACC'], on='timestamps')
 		df = pd.merge_asof(df, dfs['GYRO'], on='timestamps')
-		print(df.columns)
+
 		if 12 <= isub <= 16:
 			EEGchannels = df.columns[2:7].tolist() #2:7, 9:12, 14:18
 			ACCchannels = df.columns[10:13].tolist()
@@ -51,13 +50,9 @@ for idx, isub in enumerate(allSubjectNumber):
 		else: 
 			srate = round(1/intervals.mean())
 
-
-		# ch_names = ['TP7', 'AF9', 'AF8', 'TP10', 'Wrist', 'ACC_x', 'ACC_y', 'ACC_z', 'GYRO_x', 'GYRO_y', 'GYRO_z']
-		# This is only correct if left hemisphere is bad (strokeHemisphere == 2
-		# so need to switch columns for strokeHemisphere == 1 below)
-		ch_names = ['TPBad', 'AFBad', 'AFGood', 'TPGood', 'Wrist', 'ACC_x', 'ACC_y', 'ACC_z', 'GYRO_x', 'GYRO_y', 'GYRO_z']
-
-		ch_types = ['bio'] * 4 + ['ecg'] + ['bio'] * 6
+		ch_names = ['TP9', 'AF7', 'AF8', 'TP10', 'Wrist', 'ACC_x', 'ACC_y', 'ACC_z', 'GYRO_x', 'GYRO_y', 'GYRO_z']
+		
+		ch_types = ['eeg'] * 4 + ['ecg'] + ['bio'] * 6
 		info = mne.create_info(ch_names, ch_types=ch_types, sfreq=srate)
 		info.set_montage('standard_1020')
 
@@ -68,15 +63,6 @@ for idx, isub in enumerate(allSubjectNumber):
 		
 		data = df.to_numpy().transpose()/1000000
 		print(data.shape)
-		if strokeHemisphere[idx] == 1: # if Right
-			# so need to switch columns for strokeHemisphere == 1 below)
-			tempDataTP = data[0,:]
-			tempDataAF = data[1,:]
-			data[0,:] = data[3,:]
-			data[1,:] = data[2,:]
-			data[3,:] = tempDataTP
-			data[2,:] = tempDataAF
-
 		rawData = mne.io.RawArray(data, info)
 		picks = mne.pick_types(rawData.info, eeg=True, ecg=True,
                        bio=True)
