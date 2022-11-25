@@ -26,3 +26,12 @@ source venv/bin/activate
 git pull
 python main.py
 ```
+
+Other Scripts:
+main.py - computes spectra after dividing data into good and bad hemisphere by stroke location
+mainHemi.py - computes the spectra without considering stroke hemisphere
+plot.py - plots the output file saved by either of those two scripts 
+
+plotRaw.py - loads in each subjects data and plots all of it for sanity check
+            - can also plot the interval between time points to check sampling rate
+plotMNE.py - plots the raw data and spectra loaded into MNE for additional sanity check, 
