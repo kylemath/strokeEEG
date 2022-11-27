@@ -7,9 +7,10 @@ import pickle
 pd.options.display.float_format = '{:.9f}'.format
 
 outPSD = []
-allSubjectNumber = [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+allSubjectNumber = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+strokeHemisphere = [2, 2, 1, 2, 1, 2, 1, 2, 1,  1,  2,  2,  1,  2,  1,  2,  2,  1,  2,  1,  2,  1,  1,  1,  2,  2,  1]
 #R=1; L=2
-strokeHemisphere = [2, 2, 2, 1,	2, 1, 2, 1,	1,	2,	1,	2,	1,	2,	1,	2,	1,	1,	1,	2,	2,	1]
+# Fix timing for 12 -16 - sampling rate is irregular, use df.resample after converting time column to datetimeformat
 
 for idx, isub in enumerate(allSubjectNumber):
 
@@ -31,6 +32,37 @@ for idx, isub in enumerate(allSubjectNumber):
 			dfs[dataType].reset_index(inplace=True)
 			if 12 <= isub <= 16:
 				dfs[dataType].rename(columns = {'Timestamp (ms)':'timestamps'}, inplace = True)
+
+			if (isub == 12) & (isesh == 3): 
+					dfs[dataType] = dfs[dataType].astype({'timestamps':'float'})
+					if (dataType == 'ACC'):
+						dfs[dataType] = dfs[dataType].astype({'x':'float', 'y':'float', 'z':'float'})
+					# print(dfs[dataType])
+
+			if (isub == 15) & (isesh == 2): 
+				# print(dfs[dataType])
+				dfs[dataType] = dfs[dataType].astype({'timestamps':'float'})
+				if (dataType == 'GYRO'):
+					dfs[dataType] = dfs[dataType].astype({'x':'float', 'y':'float', 'z':'float'})
+				# print(dfs[dataType])
+
+			if (isub == 16) & (isesh == 3): 
+				# print(dfs[dataType])
+				dfs[dataType] = dfs[dataType].astype({'timestamps':'float'})
+				if (dataType == 'GYRO'):
+					dfs[dataType] = dfs[dataType].astype({'x':'float', 'y':'float', 'z':'float'})
+				# print(dfs[dataType])
+
+			if (isub == 17) & (isesh == 1): 
+				print(dfs[dataType].columns)
+				dfs[dataType] = dfs[dataType].astype({'timestamps':'float'})
+				if (dataType == 'EEG'):
+					dfs[dataType] = dfs[dataType].astype({'TP9':'float', 'AF7':'float', 'AF8':'float', 'TP10':'float', 'Right AUX':'float'})
+				print(dfs[dataType]	)
+				# print(dfs[dataType])
+
+			if (isub == 3) & (dataType == 'GYRO') & (isesh == 2):
+				dfs[dataType] = dfs[dataType].astype({'X':'float', 'Y':'float', 'Z':'float', 'timestamps':'float', 'Marker0':'float'})
 
 		df = pd.merge_asof(dfs['EEG'], dfs['ACC'], on='timestamps')
 		df = pd.merge_asof(df, dfs['GYRO'], on='timestamps')
@@ -78,12 +110,45 @@ for idx, isub in enumerate(allSubjectNumber):
 			data[3,:] = tempDataTP
 			data[2,:] = tempDataAF
 
+		print(np.shape(data))
 		rawData = mne.io.RawArray(data, info)
 		picks = mne.pick_types(rawData.info, eeg=True, ecg=True,
                        bio=True)
 
 		rawSpectra = rawData.compute_psd(picks=picks)
 		psds, freqs = rawSpectra.get_data(return_freqs=True, picks=picks)
+		if isub == 3:
+			if isesh == 2:
+				a = np.empty(np.shape(psds[-3:,:]))
+				a.fill(np.finfo(float).eps)
+				psds[-3:,:] = a
+				# print(psds[-4:,:])
+		if isub == 12:
+			if isesh == 3:
+				# print(psds[5:8,:])
+				# print(np.shape(psds[5:8,:]))
+				a = np.empty(np.shape(psds[5:8,:]))
+				a.fill(np.finfo(float).eps)
+				psds[5:8,:] = a
+				# print(psds[5:8,:])
+		if isub == 15:
+			if isesh == 2:
+				a = np.empty(np.shape(psds[5:,:]))
+				a.fill(np.finfo(float).eps)
+				psds[5:,:] = a
+
+				# print(psds[5:8,:])
+		if isub == 16:
+			if isesh == 3:
+				a = np.empty(np.shape(psds[-3:,:]))
+				a.fill(np.finfo(float).eps)
+				psds[-3:,:] = a	
+
+		if isub == 17:
+			if isesh == 1:
+				a = np.empty(np.shape(psds[:5,:]))
+				a.fill(np.finfo(float).eps)
+				psds[:5,:] = a	
 
 		subPSDs.append(psds)
 	outPSD.append(subPSDs)
@@ -93,14 +158,9 @@ npOut = np.array(outPSD)
 seshNames = ['Pre', 'Post', 'Late']
 
 preAll = np.log10(npOut[:, 0, :, 1:50])
+# print(npOut[:, 1, :, 1:50])
 postAll = np.log10(npOut[:, 1, :, 1:50])
 lateAll = np.log10(npOut[:, 2, :, 1:50])
-print('$$$$$$$$$')
-print(np.shape(preAll))
-print('$$$$$$$$$')
-
-
-
 
 prePostAll = np.subtract(preAll, postAll)
 preLateAll = np.subtract(preAll, lateAll)

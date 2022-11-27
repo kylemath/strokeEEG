@@ -7,8 +7,8 @@ import pickle
 pd.options.display.float_format = '{:.9f}'.format
 
 outPSD = []
-allSubjectNumber = [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
-strokeHemisphere = [2, 2, 2, 1,	2, 1, 2, 1,	1,	2,	1,	2,	1,	2,	1,	2,	1,	1,	1,	2,	2,	1]
+allSubjectNumber = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+strokeHemisphere = [2, 2, 1, 2, 1, 2, 1, 2, 1,	1,	2,	1,	2,	1,	2,	1,	2,	1,	1,	1,	2,	2,	1]
 
 for idx, isub in enumerate(allSubjectNumber):
 
@@ -30,6 +30,8 @@ for idx, isub in enumerate(allSubjectNumber):
 			dfs[dataType].reset_index(inplace=True)
 			if 12 <= isub <= 16:
 				dfs[dataType].rename(columns = {'Timestamp (ms)':'timestamps'}, inplace = True)
+			if (isub == 3) & (dataType == 'GYRO') & (isesh == 2):
+				dfs[dataType] = dfs[dataType].astype({'X':'float', 'Y':'float', 'Z':'float', 'timestamps':'float', 'Marker0':'float'})
 
 		df = pd.merge_asof(dfs['EEG'], dfs['ACC'], on='timestamps')
 		df = pd.merge_asof(df, dfs['GYRO'], on='timestamps')
