@@ -80,13 +80,14 @@ for idx, isub in enumerate(allSubjectNumber):
     
         # print(df)
         intervals = df['timestamps'].diff()
+        print(1/intervals.mean())
         axs[idx, isesh-1].plot(intervals)
-        axs[idx, isesh-1].set_ylim(0, 100)
+        # axs[idx, isesh-1].set_ylim(0, 100)
         if isesh == 1:
             axs[idx, isesh-1].set_ylabel(isub)
 
         if 12 <= isub <= 17:
-            srate = 256
+            srate = round(1000/intervals.mean())
         else: 
             srate = round(1/intervals.mean())
 

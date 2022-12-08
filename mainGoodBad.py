@@ -7,9 +7,21 @@ import pickle
 pd.options.display.float_format = '{:.9f}'.format
 
 outPSD = []
-allSubjectNumber = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
-strokeHemisphere = [2, 2, 1, 2, 1, 2, 1, 2, 1,  1,  2,  2,  1,  2,  1,  2,  2,  1,  2,  1,  2,  1,  1,  1,  2,  2,  1]
+# allSubjectNumber = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+# strokeHemisphere = [2, 2, 1, 2, 1, 2, 1, 2, 1,  1,  2,  2,  1,  2,  1,  2,  2,  1,  2,  1,  2,  1,  1,  1,  2,  2,  1]
+
+# allSubjectNumber = [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+# strokeHemisphere = [2, 2, 2, 1, 2, 1, 2, 1,  1,  2,  1,  2,  1,  2,  1,  2,  1,  1,  1,  2,  2,  1]
+
+
+#remove poor recanulization 11 12 and 26
+allSubjectNumber = [1, 2, 4, 5, 6, 7, 8, 9, 10, 13, 14, 18, 19, 20, 21, 22, 23, 24, 25, 27]
+strokeHemisphere = [2, 2, 2, 1, 2, 1, 2, 1,  1,  1,  2,  1,  2,  1,  2,  1,  1,  1,  2,  1]
+
+
 #R=1; L=2
+# allSubjectNumber = [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+# strokeHemisphere = [2, 2, 2, 1, 2, 1, 2, 1,  1,  2,  1,  2,  1,  2,  1,  1,  1,  2,  2,  1]
 
 for idx, isub in enumerate(allSubjectNumber):
 
@@ -77,7 +89,7 @@ for idx, isub in enumerate(allSubjectNumber):
 		intervals = df['timestamps'].diff()
 
 		if 12 <= isub <= 16:
-			srate = 256
+			srate = round(1000/intervals.mean())
 		else: 
 			srate = round(1/intervals.mean())
 
@@ -157,12 +169,12 @@ postAll = np.log10(npOut[:, 1, :, 1:50])
 lateAll = np.log10(npOut[:, 2, :, 1:50])
 
 # subtract good - bad hemisphere for each subject and channel and spectra
-preAllGoodBadTP = preAll[:,0,:]-preAll[:,3,:]
-preAllGoodBadAF = preAll[:,1,:]-preAll[:,2,:]
-postAllGoodBadTP = postAll[:,0,:]-postAll[:,3,:]
-postAllGoodBadAF = postAll[:,1,:]-postAll[:,2,:]
-lateAllGoodBadTP = lateAll[:,0,:]-lateAll[:,3,:]
-lateAllGoodBadAF = lateAll[:,1,:]-lateAll[:,2,:]
+preAllGoodBadTP = np.subtract(preAll[:,0,:], preAll[:,3,:])
+preAllGoodBadAF = np.subtract(preAll[:,1,:], preAll[:,2,:])
+postAllGoodBadTP = np.subtract(postAll[:,0,:], postAll[:,3,:])
+postAllGoodBadAF = np.subtract(postAll[:,1,:], postAll[:,2,:])
+lateAllGoodBadTP = np.subtract(lateAll[:,0,:], lateAll[:,3,:])
+lateAllGoodBadAF = np.subtract(lateAll[:,1,:], lateAll[:,2,:])
 
 preAllGoodBadTPavg =  preAllGoodBadTP.mean(axis=0).transpose()
 preAllGoodBadAFavg =  preAllGoodBadAF.mean(axis=0).transpose()

@@ -7,8 +7,18 @@ import pickle
 pd.options.display.float_format = '{:.9f}'.format
 
 outPSD = []
-allSubjectNumber = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
-strokeHemisphere = [2, 2, 1, 2, 1, 2, 1, 2, 1,  1,  2,  2,  1,  2,  1,  2,  2,  1,  2,  1,  2,  1,  1,  1,  2,  2,  1]
+# allSubjectNumber = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+# strokeHemisphere = [2, 2, 1, 2, 1, 2, 1, 2, 1,  1,  2,  2,  1,  2,  1,  2,  2,  1,  2,  1,  2,  1,  1,  1,  2,  2,  1]
+
+# allSubjectNumber = [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+# strokeHemisphere = [2, 2, 2, 1, 2, 1, 2, 1,  1,  2,  1,  2,  1,  2,  1,  2,  1,  1,  1,  2,  2,  1]
+#remove poor recanulization 11 12 and 26
+allSubjectNumber = [1, 2, 4, 5, 6, 7, 8, 9, 10, 13, 14, 18, 19, 20, 21, 22, 23, 24, 25, 27]
+strokeHemisphere = [2, 2, 2, 1, 2, 1, 2, 1,  1,  1,  2,  1,  2,  1,  2,  1,  1,  1,  2,  1]
+
+# allSubjectNumber = [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+# strokeHemisphere = [2, 2, 2, 1, 2, 1, 2, 1,  1,  2,  1,  2,  1,  2,  1,  1,  1,  2,  2,  1]
+
 #R=1; L=2
 # Fix timing for 12 -16 - sampling rate is irregular, use df.resample after converting time column to datetimeformat
 
@@ -29,6 +39,7 @@ for idx, isub in enumerate(allSubjectNumber):
 			dfs[dataType] = pd.DataFrame()
 
 			dfs[dataType] = pd.read_csv('./data/Pre_n_post_thrombectomy_studies/ID_'+ substr + '/' + substr + '_' + dataType + '_EVT_' + str(isesh) + '_stroke_study_updated.csv', engine='python')
+
 			dfs[dataType].reset_index(inplace=True)
 			if 12 <= isub <= 16:
 				dfs[dataType].rename(columns = {'Timestamp (ms)':'timestamps'}, inplace = True)
@@ -79,7 +90,7 @@ for idx, isub in enumerate(allSubjectNumber):
 		intervals = df['timestamps'].diff()
 
 		if 12 <= isub <= 16:
-			srate = 256
+			srate = round(1000/intervals.mean())
 		else: 
 			srate = round(1/intervals.mean())
 
